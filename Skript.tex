@@ -16,7 +16,7 @@
 \usepackage{float}
 \usepackage{drawstack}
 
-\usetikzlibrary{shapes.geometric, arrows, svg.path}
+\usetikzlibrary{shapes.geometric, shapes.multipart, arrows, svg.path}
 
 \tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30]
 \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
@@ -424,7 +424,7 @@ current = first
 while current != None and current_key != x:
     current = current_next
 \end{lstlisting}
-is of complexity $ \mathcal{O}(n) $ 
+is of complexity $ \mathcal{O}(n) $
 
 \section{Fourth Lecture}
 \subsection{Stacks and Queues}
@@ -449,7 +449,7 @@ is of complexity $ \mathcal{O}(n) $
 A special form of the queue is the priority queue which stores key value pairs and supports the following operations
 \begin{itemize}
     \item \verb%pqueue.create()% creates an empty priority queue
-    \item \verb%pqueue.insert(x, key)% inserts a key value pair 
+    \item \verb%pqueue.insert(x, key)% inserts a key value pair
     \item \verb%pqueue.getMin()% returns the element with the smallest key assigned
     \item \verb%pqueue.deleteMin()% removes the element with the smallest key assigned
     \item analogous to the \texttt{Min} these two methods can be implemented for the largest keys respectively
@@ -503,7 +503,7 @@ same as \texttt{stack.push()}
 \subsubsection{\texttt{queue.dequeue}}
 
 \begin{tikzpicture}
-    \stacktop{}    
+    \stacktop{}
     \bcell{first} \coordinate (first) at (currentcell.east);
     \drawstruct{(5, 0)};
     \structcell{value of \texttt{first}} \coordinate (return) at (currentcell.west);
@@ -528,7 +528,7 @@ same as \texttt{stack.push()}
     \draw[<-] (empty) -- (new);
     \draw (8.5, -2) node (bla){
         \begin{tabular}{c}
-            $ k $ with $ i < k < j $   
+            $ k $ with $ i < k < j $
         \end{tabular}
     };
 \end{drawstack}
@@ -543,7 +543,7 @@ The following operations are possible:
         \begin{itemize}
             \item if the key already exists it will be overridden
         \end{itemize}
-    \item \verb%x = dict.find(key)% returns the entry \texttt{x} 
+    \item \verb%x = dict.find(key)% returns the entry \texttt{x}
         \begin{itemize}
             \item if the key is non existent return a default value
         \end{itemize}
@@ -585,7 +585,7 @@ def selectionSort(alist):
         least = i
         for k in range(i + 1, len(alist)):
             if alist[k] < alist[least]:
-                least = k 
+                least = k
                 temp = alist[least]
         alist[least] = alist[i]
         alist[i] = temp
@@ -623,4 +623,148 @@ def insertionSort(alist):
     start_time = time.time()
     run_time = (time.time() - start_time) * 1000 #because time returns microseconds
 \end{lstlisting}
+
+\section{Fifth Lecture}
+
+\subsection{Bubble Sort}
+
+\begin{itemize}
+    \item look through array until two values are not sorted, correct that
+    \item repeat until completely sorted
+    \item array is sorted from back to front, i.e first the largest element is pushed to the back
+\end{itemize}
+
+\begin{tikzpicture}[stack/.style={rectangle split, rectangle split parts=#1,draw, anchor=center}]
+    \node[stack=5] at (0, 0)  {
+    \nodepart{two}\dots
+    \nodepart{three}\dots
+    \nodepart{four}\dots
+    \nodepart{five}sorted
+};
+    \node[stack=5] at (2, 0)  {
+    \nodepart{two}\dots
+    \nodepart{three}\dots
+    \nodepart{four}\dots
+    \nodepart{five}sorted
+};
+    \node[stack=5] at (4, 0)  {
+    \nodepart{two}\dots
+    \nodepart{three}\dots
+    \nodepart{four}\dots
+    \nodepart{five}sorted
+};
+\end{tikzpicture}
+
+\begin{lstlisting}
+def bubbleSort(nlist):
+    for j in range(len(nlist) -1):
+        for i i range(nlist-i-j):
+            if nlist[i] > nlist[i+1]:
+                temp = nlist[i]
+                nlist[i] = nlist[i+1]
+                nlist[i+1] = temp
+\end{lstlisting}
+
+\newpage
+
+\subsection{Divide and Conquer}
+\subsubsection{Quick Sort}
+\begin{itemize}
+    \item choose an (ideally median) element from list as pivot
+    \item create two lists and sort in elements accordingly
+        \begin{itemize}
+            \item left: smaller than pivot
+            \item right: larger than pivot
+            \item sort both sub lists
+        \end{itemize}
+\end{itemize}
+
+\begin{tikzpicture}[stack/.style={rectangle split, rectangle split parts=#1,draw, anchor=center}]
+    \node[stack=10] at (0, 0)  {
+    \nodepart{two}
+    \nodepart{three}
+    \nodepart{four}
+    \nodepart{five}
+    \nodepart{six}
+    \nodepart{seven}
+    \nodepart{eight}
+    \nodepart{nine}
+    \nodepart{ten}
+};
+\node[stack=4] at (5, 1.5)  {
+    \nodepart{two}
+    \nodepart{three}
+    \nodepart{four}
+    \nodepart{five}
+    \nodepart{six}
+    \nodepart{seven}
+    \nodepart{eight}
+    \nodepart{nine}
+    \nodepart{ten}
+};
+
+\node[stack=1] at (5, 0) {
+    \nodepart{one}$p$
+};
+
+\node[stack=4] at (5, -1.5)  {
+    \nodepart{two}
+    \nodepart{three}
+    \nodepart{four}
+    \nodepart{five}
+    \nodepart{six}
+    \nodepart{seven}
+    \nodepart{eight}
+    \nodepart{nine}
+    \nodepart{ten}
+};
+
+\node at (2.5, 2){
+    elements smaller than $p$
+};
+
+\node at (2.5, -2){
+    elements larger than $p$
+};
+
+\draw[->] (0.5, 0) -- (4.5, 0);
+\draw[->] (0.5, 0.5) -- (4.5, 1.5);
+\draw[->] (0.5, -0.5) -- (4.5, -1.5);
+\end{tikzpicture}
+
+\begin{itemize}
+    \item divide problem into (two or more) sub problems
+    \item recursively solve those sub problems
+    \item combine sub solutions to solve the initial problem
+\end{itemize}
+How to pivot the array:
+\begin{itemize}
+    \item go through array from left to right
+    \item if the element's index and value are smaller than the pivot do nothing
+    \item if not swap with an element from the other side
+    \item take $ l $ and $ r $ to walk through the array from left to right ( $ l $ ) or from right to left ( $ r $ )
+    \item increment $ l $ until $ A[ \ l \ ] > p $ (this element has to be swapped to the right) 
+    \item decrement $ r $ until $ A [ \ r \ ] \leq p $ (this element has to be swapped)
+    \item swap element $ l $ with $ r $ 
+    \item $ l = l + 1 $ and $ r = r-1 $ 
+    \item done when $ l = r $ 
+\end{itemize}
+Note that choice matters when it comes to the pivot.
+Ideally the pivot splits the list into two parts, almost equal in size.
+But Since calculating the median requires sorting simply choosing the median is not an option.
+In reality some random element is often chosen as pivot, like the first or last element or a random choice.
+For more precision an assortment of elements can randomly be selected from the list.
+The pivot is then obtained by choosing the median of those elements.
+
+Even though quick sort is somewhat fast (of average complexity $ \mathcal{O}(n \cdot \log{n}) $)
+it has one problem. Choosing an inefficient pivot (deviating a lot from the median) adds a lot of complexity.
+
+\subsubsection{Merge Sort}
+Merge Sort avoids quick sort's pivot problems by not using one.
+\begin{itemize}
+    \item divide list in the middle
+    \item recursively sort the sub lists
+    \item combine sorted sub lists
+\end{itemize}
+
 \end{document}
