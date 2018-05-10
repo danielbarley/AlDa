@@ -15,6 +15,7 @@
 \usepackage{tikz}
 \usepackage{float}
 \usepackage{drawstack}
+\usepackage{booktabs}
 
 \usetikzlibrary{shapes.geometric, shapes.multipart, arrows, svg.path}
 
@@ -27,7 +28,8 @@
 
 
 \lstset{language=Python,
-    backgroundcolor=\color{yellow},
+    backgroundcolor=\color{red!10},
+    basicstyle=\color{black},
     keywordstyle=\color{blue},
     stringstyle=\color{purple},
     postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
@@ -44,8 +46,10 @@
 \pagestyle{fancy}
 \fancyhf{}
 \lhead{Alda}
-\rhead{SS18}
+\rhead{ST18}
 \rfoot{Page \thepage}
+
+\usepackage{hyperref}
 
 \begin{document}
 
@@ -552,14 +556,17 @@ The following operations are possible:
 
 \begin{table}[H]
     \centering
-    \caption{complexity}
+    \caption{Complexity}
     \label{tab:label}
     \begin{tabular}{ccccc}
+        \toprule \\
         operation       & list               & array              & sorted array            & dictionary                 \\
+        \midrule \\
         \texttt{create} & $ \mathcal{O}(1) $ & $ \mathcal{O}(1) $ & $\mathcal{O}(1) $       & $ \mathcal{O}(1) $         \\
         \texttt{insert} & $ \mathcal{O}(n) $ & $ \mathcal{O}(n) $ & $\mathcal{O}(n) $       & $ \mathcal{O}(n \log{n}) $ \\
         \texttt{find}   & $ \mathcal{O}(n) $ & $ \mathcal{O}(n) $ & $\mathcal{O}(\log{n}) $ & $ \mathcal{O}() $          \\
         \texttt{delete} & $ \mathcal{O}(n) $ & $ \mathcal{O}(n) $ & $\mathcal{O}(n) $       & $ \mathcal{O}() $          \\
+        \bottomrule
     \end{tabular}
 \end{table}
 
@@ -766,5 +773,148 @@ Merge Sort avoids quick sort's pivot problems by not using one.
     \item recursively sort the sub lists
     \item combine sorted sub lists
 \end{itemize}
+
+\section{Sixth Lecture}
+\subsection{Merge Sort revisited}
+\begin{table}[H]
+    \centering
+    \caption{Quicksort vs. Mergesort}
+    \label{tab:sorting}
+    \begin{tabular}{cc}
+        \toprule \\
+        Quicksort & Mergesort \\
+        \midrule \\
+        $ \mathcal{O}(n \cdot \log{n}) $ on average & $ \mathcal{O}(n \cdot \log{n}) $ on average \\
+        $ \mathcal{O}(n^2) $ in worst case & $ \mathcal{O}(n \cdot \log{n}) $ in worst case \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{lstlisting}
+MergeSort(A, start, end, tmp):
+    if end - start > 1:
+        middle = start + (end - start) // 2 #integer division
+        MergeSort(A, start, middle, tmp)
+        MergeSort(A, middle, end, tmp)
+    pos = start
+    i = start
+    j = middle
+    while pos < end:
+        if(i < middle) and (j = end) or (A[i] < A[j]):
+            tmp[pos] = A[i]
+            i += 1
+            pos += 1
+        else:
+            tmp[pos] + A[j]
+            j += 1
+            pos += 1
+\end{lstlisting}
+So merge Sort is guaranteed to be of complexity $ n \cdot \log{n} $. 
+
+\subsection{Complexity}
+\begin{itemize}
+    \item How does the computing time change with respect to the problem's size?
+    \item different possible approaches for merit
+        \begin{itemize}
+            \item simply measure computing time
+                \begin{itemize}
+                    \item depends on the used hardware
+                    \item depends on implementation and programming language
+                \end{itemize}
+            \item count the number of elementary operations
+                \begin{itemize}
+                    \item better approximation
+                    \item still deviations on real systems (caching)
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
+The complexity is an abstract merit for runtime predictions.
+A naive approach would be to simply count the number of atomic operation needed to complete the task at hand.
+For example:
+\begin{itemize}
+    \item $ +, -, /, *, \% $ 
+    \item memory access
+    \item function calls
+\end{itemize}
+For this to be consistent some approximations have to be made:
+\begin{itemize}
+    \item all atomic operations cost exactly one unit of time
+    \item all memory access is equally fast
+\end{itemize}
+\subsubsection{example: Insertion Sort}
+\begin{table}[H]
+    \centering
+    \caption{Atomic Operations Insertion Sort}
+    \label{tab:insertion}
+    \begin{tabular}{lcc}
+        \toprule \\
+        insertionSort(A) & cost & number of calls \\
+        \midrule \\
+        \verb#for j=2 to A.lenght# & $ C_1 $ & $ n $ \\
+        \verb#key = A[i]# & $ C_2 $ & $ n-1 $ \\
+        \verb#i = j-1# & $ C_4 $ & $ n-1 $ \\
+        \verb#while j > 0 and a[i] > key# & $ C_5 $ & $ \sum_{j=2}^{n} t $ \\
+        \verb#    A[i+i] = A[i]# & $ C_6 $ & $ \sum_{j=2}^{n} (t_j -1) $ \\
+        \verb#    i = j - 1# & $ C_7 $ & $ \sum_{j=2}^{n} (t_i -1) $ \\
+        \verb#A[i + j] = key# & $ C_8 $ & $ n-1 $ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+\subsubsection{Further Simplification}
+Example:
+\begin{itemize}
+    \item Runtime is given by $ T(n) = a n^2 + b n + c $ 
+    \item The parameters $ a, b, c $ still depend on the implementation and the hardware
+\end{itemize}
+In order to obtain a hardware independent estimate we drop all parameter and only take the fastest growing term into account.
+\begin{itemize}
+    \item up until now: look at the number of atomic operations
+        \begin{itemize}
+            \item simplification 1: calculate upper limit by counting atomic operations
+            \item Simplification 2: parameter is size of input $ n $ 
+        \end{itemize}
+\end{itemize}
+
+\subsection{Bachmann-Landau Notation or Big-O Notation}
+Using the Big-O notation the asymptotic behavior of functions can be approximated.
+\begin{itemize}
+    \item $ \exists C $ so that $ C:T(n) \leq Cf(n) \Rightarrow T(n) \in \mathcal{O}(f(n)) $ 
+    \item $ \exists C' $ so that $ C' T(n) \geq C'f(n) \Rightarrow T(n) \in \Omega(f(n)) $ 
+\end{itemize}
+formal definitions:
+\begin{itemize}
+    \item $ \mathcal{O}(f(n)) = \{f \  | \ \exists C > 0, n_0 > 0 \  \forall n \geq n_0 : f(n) \leq g(n)\} $ 
+    \item $ f(n) \in \mathcal{O}(g(n)) $, if there exists constant $ C > 0, n_0 >0 $ so that $ f(n) \leq C g(n) $ for all $ n \geq n_0 $ 
+    \item $   \Omega(f(n)) = \{f \  | \ \exists C > 0, n_0 > 0 \  \forall n \geq n_0 : f(n) \geq g(n)\} $ 
+    \item $ f(n) \in \mathcal{O}(g(n)) $, if there exists constant $ C > 0, n_0 >0 $ so that $ f(n) \geq C g(n) $ for all $ n \geq n_0 $ 
+    \item in short:
+    \item $ f(n) \in \mathcal{O}(g(n)) $ 
+        \begin{itemize}
+            \item $ f(n) $ does not grow faster than $ g(n) $ (asymptotically) 
+        \end{itemize}
+    \item $ f(n) \in \Omega(g(n)) $ 
+        \begin{itemize}
+            \item $ f(n) $ does grow at least as fast as $ g(n) $ (asymptotically) 
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{Example Bubble Sort}
+Pseudo-Code:
+\begin{lstlisting}
+BubbleSort(A):
+    for i in range(0, n-2):
+        for j in range(0, n-2-i):
+            if A[j] > A[i+j]:
+                swap(A[j], A[j+1])
+\end{lstlisting}
+$ T(n) \leq c \underbrace{\# \text{loop count}}_{X(n)} $ 
+so $ c' n^2 \leq X(n) = \sum_{i=0}^{n-2} (n-2-i) \leq c n^2 $ therefore $ T(n) \in \mathcal{O}(n^2) $ with 
+$ T(n)= \begin{cases}
+    f(n) \in \Omega(n^2) \\
+    f(n) \in \Theta(n^2)
+\end{cases} $ 
+
+
+
 
 \end{document}
